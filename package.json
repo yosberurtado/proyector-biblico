@@ -1,7 +1,7 @@
 {
   "name": "proyector-biblico",
   "productName": "Proyector Bíblico",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Proyector de la Biblia para iglesias: Reina-Valera 1909 y King James, temas claro y oscuro, funciona sin internet.",
   "main": "main.js",
   "author": "Proyector Bíblico",
@@ -14,8 +14,8 @@
     "dist:win": "electron-builder --win --publish never"
   },
   "devDependencies": {
-    "electron": "^33.0.0",
-    "electron-builder": "^25.1.8"
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0"
   },
   "build": {
     "appId": "org.proyectorbiblico.app",
@@ -31,7 +31,16 @@
       "buildResources": "build",
       "output": "dist"
     },
-    "afterPack": "build/afterPack.js",
+    "afterSign": "build/adhocSign.js",
+    "electronFuses": {
+      "runAsNode": false,
+      "enableCookieEncryption": true,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true,
+      "resetAdHocDarwinSignature": true
+    },
     "mac": {
       "category": "public.app-category.lifestyle",
       "icon": "build/icon.png",

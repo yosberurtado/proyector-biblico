@@ -1,10 +1,24 @@
 // Proyector Bíblico — aplicación de escritorio (Electron)
 // Funciona sin internet: la Biblia, las fotos y las tipografías van dentro de app/index.html
-const { app, BrowserWindow, screen, shell, Menu } = require("electron");
+const { app, BrowserWindow, screen, shell, Menu, session } = require("electron");
 const path = require("path");
 
 const PROJECTOR_NAME = "proyectorBiblicoLive";
 let mainWindow = null;
+
+// Seguridad: la app solo muestra su propio contenido local.
+// Permisos que la página puede usar; todo lo demás (cámara, micrófono, ubicación, notificaciones…) se niega.
+const ALLOWED_PERMISSIONS = new Set(["fullscreen", "clipboard-sanitized-write"]);
+
+// Seguridad para TODAS las ventanas (incluida la de proyección):
+// sin <webview>, sin abrir ventanas nuevas y sin navegar fuera de los archivos de la app.
+app.on("web-contents-created", (_event, contents) => {
+  contents.on("will-attach-webview", (e) => e.preventDefault());
+  contents.setWindowOpenHandler(() => ({ action: "deny" }));
+  contents.on("will-navigate", (e, url) => {
+    if (!url.startsWith("file://")) e.preventDefault();
+  });
+});
 
 // Una sola instancia abierta a la vez
 if (!app.requestSingleInstanceLock()) {
@@ -107,6 +121,10 @@ function buildMenu() {
 }
 
 app.whenReady().then(() => {
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) =>
+    callback(ALLOWED_PERMISSIONS.has(permission))
+  );
+  session.defaultSession.setPermissionCheckHandler((_wc, permission) => ALLOWED_PERMISSIONS.has(permission));
   buildMenu();
   createMainWindow();
   app.on("activate", () => {
