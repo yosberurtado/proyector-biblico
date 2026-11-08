@@ -39,7 +39,7 @@
       ]
     },
     "dmg": {
-      "title": "Proyector Bíblico",
+      "title": "Proyector Biblico",
       "artifactName": "Proyector-Biblico-${version}-mac-${arch}.${ext}"
     },
     "win": {
