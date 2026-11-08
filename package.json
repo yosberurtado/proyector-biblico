@@ -19,7 +19,7 @@
   },
   "build": {
     "appId": "org.proyectorbiblico.app",
-    "productName": "Proyector Bíblico",
+    "productName": "Proyector Biblico",
     "copyright": "Biblia: dominio público · Tipografías: SIL Open Font License",
     "files": [
       "main.js",
@@ -37,7 +37,10 @@
       "icon": "build/icon.png",
       "target": [
         "dmg"
-      ]
+      ],
+      "extendInfo": {
+        "CFBundleDisplayName": "Proyector Bíblico"
+      }
     },
     "dmg": {
       "title": "Proyector Biblico",
