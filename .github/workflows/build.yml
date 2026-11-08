@@ -36,7 +36,17 @@ jobs:
         run: npm install
 
       - name: Construir instalador
-        run: npx electron-builder ${{ matrix.target }} --publish never
+        shell: bash
+        # En Mac se crea un .dmg por arquitectura, uno detrás de otro:
+        # si se crean a la vez, los dos discos temporales chocan (error "hdiutil detach").
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            npx electron-builder --mac --arm64 --publish never
+            npx electron-builder --mac --x64 --publish never
+          else
+            npx electron-builder ${{ matrix.target }} --publish never
+          fi
+          ls -la dist
         env:
           # Sin certificado de firma: el instalador funciona, pero el sistema mostrará un aviso la primera vez.
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
