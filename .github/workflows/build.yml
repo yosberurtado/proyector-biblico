@@ -6,6 +6,11 @@ name: Construir instaladores
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Etiqueta de una Release ya publicada a la que adjuntar los instaladores (ej. v1.0.0). Vacío = solo compilar."
+        required: false
+        default: ""
   release:
     types: [published]
 
@@ -61,7 +66,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || inputs.tag != ''
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -74,7 +79,7 @@ jobs:
       - name: Publicar versión para descargar
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ github.event.release.tag_name || inputs.tag }}
           files: dist/*
           body: |
             ## Descargas
