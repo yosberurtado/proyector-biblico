@@ -1,0 +1,70 @@
+{
+  "name": "proyector-biblico",
+  "productName": "Proyector Bíblico",
+  "version": "1.0.0",
+  "description": "Proyector de la Biblia para iglesias: Reina-Valera 1909 y King James, temas claro y oscuro, funciona sin internet.",
+  "main": "main.js",
+  "author": "Proyector Bíblico",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "dist:mac": "electron-builder --mac --publish never",
+    "dist:win": "electron-builder --win --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "org.proyectorbiblico.app",
+    "productName": "Proyector Bíblico",
+    "copyright": "Biblia: dominio público · Tipografías: SIL Open Font License",
+    "files": [
+      "main.js",
+      "app/**/*",
+      "build/icon.png",
+      "licenses/**/*"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.lifestyle",
+      "icon": "build/icon.png",
+      "target": [
+        { "target": "dmg", "arch": ["arm64", "x64"] }
+      ]
+    },
+    "dmg": {
+      "title": "Proyector Bíblico",
+      "artifactName": "Proyector-Biblico-${version}-mac-${arch}.${ext}"
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Proyector Bíblico",
+      "artifactName": "Proyector-Biblico-${version}-Windows-Instalador.${ext}"
+    },
+    "portable": {
+      "artifactName": "Proyector-Biblico-${version}-Windows-Portable.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Education",
+      "artifactName": "Proyector-Biblico-${version}-Linux.${ext}"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+# Construye los instaladores de Mac y Windows en los servidores de GitHub.
+# - Se ejecuta a mano desde la pestaña "Actions" (botón "Run workflow"),
+# - o automáticamente al publicar una "Release" (por ejemplo v1.0.0),
+#   y en ese caso sube los instaladores a esa Release para que cualquiera los descargue.
+name: Construir instaladores
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: --mac
+          - os: windows-latest
+            target: --win
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Construir instalador
+        run: npx electron-builder ${{ matrix.target }} --publish never
+        env:
+          # Sin certificado de firma: el instalador funciona, pero el sistema mostrará un aviso la primera vez.
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+
+      - name: Guardar instaladores
+        uses: actions/upload-artifact@v4
+        with:
+          name: instaladores-${{ matrix.os }}
+          path: |
+            dist/*.dmg
+            dist/*.exe
+          if-no-files-found: error
+
+  release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reunir instaladores
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publicar versión para descargar
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: dist/*
+          body: |
+            ## Descargas
+            - **Mac con chip Apple (M1, M2, M3, M4…):** archivo que termina en `mac-arm64.dmg`
+            - **Mac con Intel:** archivo que termina en `mac-x64.dmg`
+            - **Windows (instalador):** `Windows-Instalador.exe`
+            - **Windows (sin instalar):** `Windows-Portable.exe`
+
+            Funciona sin internet. Incluye la Reina-Valera 1909 y la King James Version (dominio público).
