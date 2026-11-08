@@ -10,7 +10,7 @@
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder --publish never",
-    "dist:mac": "electron-builder --mac --publish never",
+    "dist:mac": "electron-builder --mac --arm64 --publish never && electron-builder --mac --x64 --publish never",
     "dist:win": "electron-builder --win --publish never"
   },
   "devDependencies": {
@@ -35,7 +35,7 @@
       "category": "public.app-category.lifestyle",
       "icon": "build/icon.png",
       "target": [
-        { "target": "dmg", "arch": ["arm64", "x64"] }
+        "dmg"
       ]
     },
     "dmg": {
@@ -45,8 +45,18 @@
     "win": {
       "icon": "build/icon.png",
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ]
     },
     "nsis": {
@@ -62,7 +72,9 @@
       "artifactName": "Proyector-Biblico-${version}-Windows-Portable.${ext}"
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Education",
       "artifactName": "Proyector-Biblico-${version}-Linux.${ext}"
     }
