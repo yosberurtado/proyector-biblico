@@ -63,6 +63,19 @@ jobs:
           # Sin certificado de firma: el instalador funciona, pero el sistema mostrará un aviso la primera vez.
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
 
+      - name: Verificar firma y fusibles de seguridad (Mac)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          for app in dist/mac*/*.app; do
+            echo "== $app"
+            codesign --verify --deep --strict --verbose=2 "$app"
+            npx @electron/fuses read --app "$app" | tee fuses.txt
+            grep -q "RunAsNode is Disabled" fuses.txt
+            grep -q "EnableEmbeddedAsarIntegrityValidation is Enabled" fuses.txt
+            grep -q "OnlyLoadAppFromAsar is Enabled" fuses.txt
+          done
+
       - name: Guardar instaladores
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
